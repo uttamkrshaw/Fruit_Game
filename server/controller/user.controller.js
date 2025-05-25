@@ -53,10 +53,14 @@ UserRouter.post('/login', async (req, res) => {
 
 // User Registeration
 UserRouter.post('/register', uploadMiddleWare.single('profile'), async (req, res) => {
+    console.log("Body",req?.body);
+    console.log("Profile",req?.file?.location);
+
+
     const { name, email, password } = req.body;
     try {
         if (!name || !email || !password) {
-            return res.json({ status: 'error', message: 'User Email & Password is Required To Login!' })
+            return res.json({ status: 'error', message: 'User Email & Password is Required To Registered!' })
         }
 
         if (!req.file) {
