@@ -5,6 +5,7 @@ import { apiurl } from "@/defaults/apiurl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 
 const loginSchema = z.object({
@@ -31,15 +32,19 @@ export default function Home() {
 
   const onSubmit = async (data) => {
     // Call API or handle authentication here
-    fetch(`${apiurl}user/login`, {
-      method: 'Post',
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": 'application/json'
+    try {
+      const response = await axios.post(`${apiurl}user/login`, data)
+      const res = response.data;
+
+      if (res.status === 'success') {
+        toast.success(res.message);
+        router.push("/")
+      } else {
+        toast.error(res.message)
       }
-    }).then((res) => res.json())
-      .then((res) => { res.status === 'success' ? (toast.success(res.message), localStorage.setItem('userInfo', JSON.stringify(res.token)), router.push('/chat')) : (toast.error(res.message), console.log("error", res)) })
-      .catch((err) => toast.error(err.message))
+    } catch (error) {
+      toast.error(error.message)
+    }
 
   };
   return (
@@ -47,7 +52,7 @@ export default function Home() {
       <div className="max-w-md mx-auto p-10 bg-white shadow-md rounded-lg m-auto">
         <h2 className="text-2xl font-semibold text-center mb-4 text-black">User Login</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="false">
-          
+
           <div>
             <label className="block text-lg font-medium text-black">Email</label>
             <input

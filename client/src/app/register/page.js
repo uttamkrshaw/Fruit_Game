@@ -5,6 +5,8 @@ import { apiurl } from "@/defaults/apiurl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -43,27 +45,30 @@ export default function Home() {
 
     const onSubmit = async (data) => {
         // Call API or handle authentication here
-        console.log(data);
+
         const formData = new FormData();
-        formData.profile = data.profile;
-        formData.name = data.name;
-        formData.email = data.email;
-        formData.password = data.password;
-        console.log(formData);
+        formData.append("profile", data.profile[0]);
+        formData.append("name", data.name);
+        formData.append("email", data.email);
+        formData.append("password", data.password);
 
+        try {
+            const response = await axios.post(`${apiurl}user/register`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            const res = response.data;
 
-        fetch(`${apiurl}user/register`, {
-            method: 'Post',
-            // body: JSON.stringify(data),
-            body: formData,
-            // headers: {
-            //     // "Content-Type": 'application/json'
-            //     "Content- Type": "multipart/form-data"
-
-            // }
-        }).then((res) => res.json())
-            .then((res) => { res.status === 'success' ? (toast.success(res.message), router.push('/')) : (toast.error(res.message)) })
-            .catch((err) => toast.error(err.message))
+            if (res.status === 'success') {
+                toast.success(res.message);
+                router.push("/")
+            } else {
+                toast.error(res.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
 
     };
     return (
