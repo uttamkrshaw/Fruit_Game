@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from "http";
 import { connectDB } from './config/db.js';
+import { Routes } from './routes/routes.js';
 const app = express();
 const server = createServer(app);
 
@@ -22,6 +23,7 @@ app.use(cors({
     credentials: true
 }))
 
+app.use("/api/v1/",Routes)
 
 
 
