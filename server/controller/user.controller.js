@@ -40,8 +40,9 @@ UserRouter.post('/login', async (req, res) => {
         } else {
             const decodedpassword = GeneratePasswordCode(password);
             if (decodedpassword === user[0].password) {
-                const token = await GenerateToken({ _id: user[0]._id, name: user[0].name, email: user[0].email, profile: user[0].profile })
-                return res.json({ status: 'success', message: 'Login Successful', redirect: '/', token: token?.token, user: user[0]?.type })
+                const token = await GenerateToken({ _id: user[0]._id, name: user[0].name, email: user[0].email, profile: user[0].profile, type: user[0].type })
+                const userdetails = { _id: user[0]._id, name: user[0].name, email: user[0].email, profile: user[0].profile, score: user[0].score }
+                return res.json({ status: 'success', message: 'Login Successful', redirect: `/dashboard/${user[0].type.toLowerCase()}`, token: token?.token, type: user[0]?.type, user: userdetails })
             } else {
                 return res.json({ status: 'error', message: 'Wrong Password' })
             }
@@ -53,9 +54,6 @@ UserRouter.post('/login', async (req, res) => {
 
 // User Registeration
 UserRouter.post('/register', uploadMiddleWare.single('profile'), async (req, res) => {
-    console.log("Body", req?.body);
-    console.log("Profile", req?.file?.location);
-
 
     const { name, email, password } = req.body;
     try {
@@ -109,6 +107,34 @@ UserRouter.patch('/edit/me', UserAuthentication, uploadMiddleWare.single('profil
     }
 })
 
+// User Score Details
+UserRouter.get('/list', UserAuthentication, async (req, res) => {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.decode(token, process.env.SecretKey);
+    try {
+        const user = await UserModel.find({ _id: decoded._id, disabled: false });
+        if (user.length === 0) {
+            return res.json({ status: 'error', message: 'No User Found!' })
+        } else {
+            return res.json({ status: 'success', data: user[0].score })
+        }
+    } catch (error) {
+        return res.json({ status: 'error', message: 'Failed To Fetch User Score!' })
+    }
+})
+
+// Listing All User Based On Score
+UserRouter.get('/listall', UserAuthentication, async (req, res) => {
+    try {
+        const user = await UserModel.find({ disabled: false, type: 'User' }, { password: 0 }).sort({ score: -1 })
+        if (user.length === 0) {
+            return res.json({ status: 'error', message: `No Active User Found!` })
+        }
+        return res.json({ status: 'success', data: user })
+    } catch (error) {
+        return res.json({ status: 'error', message: `Failed To Update User Detail's. Error:- ${error.message}` })
+    }
+})
 
 // Admin Routes
 

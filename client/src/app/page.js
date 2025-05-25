@@ -6,6 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
+import OpenRoute from "@/components/routes/openroutes";
+import { useState } from "react";
+import Login from "@/components/login";
+import Register from "@/components/register";
 
 
 const loginSchema = z.object({
@@ -20,69 +25,35 @@ const loginSchema = z.object({
 });
 
 export default function Home() {
-  const router = useRouter();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: zodResolver(loginSchema),
-  });
-
-  const onSubmit = async (data) => {
-    // Call API or handle authentication here
-    try {
-      const response = await axios.post(`${apiurl}user/login`, data)
-      const res = response.data;
-
-      if (res.status === 'success') {
-        toast.success(res.message);
-        router.push("/")
-      } else {
-        toast.error(res.message)
-      }
-    } catch (error) {
-      toast.error(error.message)
-    }
-
-  };
+  const [showLogin, setShowLogin] = useState(true);
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="max-w-md mx-auto p-10 bg-white shadow-md rounded-lg m-auto">
-        <h2 className="text-2xl font-semibold text-center mb-4 text-black">User Login</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="false">
-
-          <div>
-            <label className="block text-lg font-medium text-black">Email</label>
-            <input
-              type="email"
-              autoFocus={true}
-              {...register("email")}
-              className=" text-black w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+    <OpenRoute>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+          <div className="flex justify-center gap-4 mb-6">
+            <button
+              onClick={() => setShowLogin(true)}
+              className={`px-4 py-2 rounded ${showLogin ? "bg-blue-600 text-white" : "bg-gray-200 text-black"
+                }`}
+            >
+              Login
+            </button>
+            <button
+              onClick={() => setShowLogin(false)}
+              className={`px-4 py-2 rounded ${!showLogin ? "bg-blue-600 text-white" : "bg-gray-200 text-black"
+                }`}
+            >
+              Register
+            </button>
           </div>
 
-          <div>
-            <label className="block text-lg font-medium text-black">Password</label>
-            <input
-              type="password"
-              {...register("password")}
-              className=" text-black w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Logging in..." : "Login"}
-          </button>
-        </form>
+          {showLogin ? (
+            <Login />
+          ) : (
+            <Register />
+          )}
+        </div>
       </div>
-    </div>
+    </OpenRoute>
   );
 }

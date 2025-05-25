@@ -59,7 +59,6 @@ export default function Home() {
                 }
             })
             const res = response.data;
-
             if (res.status === 'success') {
                 toast.success(res.message);
                 router.push("/")
