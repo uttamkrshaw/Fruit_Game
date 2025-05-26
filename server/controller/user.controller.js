@@ -86,6 +86,18 @@ UserRouter.post('/register', uploadMiddleWare.single('profile'), async (req, res
     }
 })
 
+
+// User Details
+UserRouter.get('/me', UserAuthentication, async (req, res) => {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.decode(token, process.env.SecretKey)
+    try {
+        return res.json({ status: 'success', data: decoded })
+    } catch (error) {
+        return res.json({ status: 'error', message: `Failed To Fetch User Details. Error:- ${error.message}` })
+    }
+})
+
 // User Edit Details 
 UserRouter.patch('/edit/me', UserAuthentication, uploadMiddleWare.single('profile'), async (req, res) => {
     const token = req.headers.authorization.split(" ")[1];

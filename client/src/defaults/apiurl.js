@@ -1,4 +1,4 @@
 
-const apiurl = 'http://localhost:4500/api/v1/'
+const apiurl = 'http://localhost:4500'
 
 module.exports = {apiurl}

@@ -37,7 +37,7 @@ export default function Login() {
   const onSubmit = async (data) => {
     // Call API or handle authentication here
     try {
-      const response = await axios.post(`${apiurl}user/login`, data)
+      const response = await axios.post(`${apiurl}/api/v1/user/login`, data)
       const res = response.data;
 
       if (res.status === 'success') {

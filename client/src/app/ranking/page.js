@@ -3,13 +3,14 @@
 import UserNavbar from "@/components/navbar/usernavbar";
 import UserRoute from "@/components/routes/userroutes";
 import { useAuth } from "@/context/AuthContext";
+import { apiurl } from "@/defaults/apiurl";
 import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 
 export default function RankingPage() {
     const [players, setPlayers] = useState([]);
     const { user } = useAuth();
-    const socket = io('http://localhost:4500'); // Replace with actual domain in production
+    const socket = io(`${apiurl}`); // Replace with actual domain in production
 
     // Replace this with your API URL
 
@@ -18,11 +19,11 @@ export default function RankingPage() {
             socket.emit("scores"); // 🔥 Request own score on connect
         }
 
-        socket.on('rankings', (data) => {
+        socket.on('rankings', (data) => {            
             setPlayers(data);
         });
 
-        socket.on('update', (data) => {            
+        socket.on('update', (data) => {                        
             setPlayers(data);
         });
 

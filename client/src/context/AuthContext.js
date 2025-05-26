@@ -1,6 +1,9 @@
 "use client";
 
+import { apiurl } from "@/defaults/apiurl";
+import axios from "axios";
 import { createContext, useContext, useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext(null);
 
@@ -9,11 +12,31 @@ export const AuthProvider = ({ children }) => {
     const [userType, setUserType] = useState("");
     const [user, setUser] = useState([]);
 
+    const GetUserDetails = async ({ token }) => {
+        try {
+            const res = await axios.get(`${apiurl}/api/v1/user/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            const response = res.data;
+            if (response?.status === 'success') {
+                setUser(response.data)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+
+    }
+
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem("token")); // or sessionStorage / cookie
         const type = JSON.parse(localStorage.getItem("type"));
         setUserType(type);
         setIsAuthenticated(!!token);
+        if (token) {
+            GetUserDetails({ token: token })
+        }
     }, []);
 
     return (

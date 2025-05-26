@@ -5,6 +5,7 @@ import UserNavbar from "@/components/navbar/usernavbar";
 import UserRoute from "@/components/routes/userroutes";
 import io from 'socket.io-client';
 import { useAuth } from "@/context/AuthContext";
+import { apiurl } from "@/defaults/apiurl";
 
 
 
@@ -12,7 +13,7 @@ export default function Home() {
     const router = useRouter();
     const { user } = useAuth()
     const [clickCount, setClickCount] = useState(0);
-    const socket = io('http://localhost:4500'); // Replace with actual domain in production
+    const socket = io(`${apiurl}`); // Replace with actual domain in production
 
     useEffect(() => {
         if (user) {
@@ -29,14 +30,8 @@ export default function Home() {
     }, [clickCount]);
 
     const handleClick = () => {
-        // setClickCount(clickCount + 1);
         socket.emit('increment', user._id);
     };
-
-
-    // const handleClick = () => {
-    //     socket.emit('increment', user._id);
-    // };
 
     return (
         <>

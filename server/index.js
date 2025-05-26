@@ -29,65 +29,13 @@ app.use("/api/v1/", Routes);
 // Setup Socket.IO
 const io = new Server(server, { cors: corsOptions });
 
-// io.on('connection', (socket) => {
-//     console.log('✅ New client connected');
-
-//     // Increment Score of User
-//     socket.on('increment', async (userId) => {
-//         try {
-//             // Update the score
-//             const user = await UserModel.findOneAndUpdate(
-//                 { _id: userId },
-//                 { $inc: { score: 1 } },
-//                 { new: true, upsert: true }
-//             );
-
-//             // Get top users
-//             const users = await UserModel.find({ disabled: false, type: 'User' }).sort({ score: -1 });
-
-//             // Emit full leaderboard update
-//             io.emit('update', users);
-//         } catch (error) {
-//             console.error('Error during score update:', error.message);
-//         }
-//     });
-
-//     socket.on('join', async (userId) => {
-//         try {
-//             const user = await UserModel.find({_id:userId,disabled:false,type:'User'});
-//             socket.emit('my_score', user.score);
-//         } catch (error) { 
-//             console.error('Error fetching user score on join:', error.message);
-//         }
-//     });
-
-//     socket.on('score', async (userId) => {
-//         try {
-//             // Get User Score
-//             const user = await UserModel.find({ _id: userId, disabled: false });
-
-//             // Emit full leaderboard update
-//             io.emit('update', users);
-//         } catch (error) {
-//             console.error('Error during score update:', error.message);
-//         }
-//     });
-
-//     socket.on('disconnect', () => {
-//         console.log('❌ Client disconnected');
-//     });
-// });
-
-// Start Server
-
-
 io.on('connection', (socket) => {
     console.log('✅ New client connected');
 
     // When user joins, fetch and send their score
     socket.on('scores', async () => {
         try {
-            const user = await UserModel.find({ disabled: false, type: 'User' }, { password: 0 });
+            const user = await UserModel.find({ disabled: false, type: 'User' }, { password: 0 }).sort({ score: -1 })
             if (user) {
                 socket.emit('rankings', user); // 🔥 send their score only to them
             }

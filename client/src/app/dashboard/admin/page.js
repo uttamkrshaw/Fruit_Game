@@ -54,7 +54,7 @@ export default function Home() {
         formData.append("password", data.password);
 
         try {
-            const response = await axios.post(`${apiurl}user/register`, formData, {
+            const response = await axios.post(`${apiurl}/api/v1/user/register`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

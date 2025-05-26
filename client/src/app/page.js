@@ -1,28 +1,8 @@
 "use client";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { apiurl } from "@/defaults/apiurl";
-import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
 import OpenRoute from "@/components/routes/openroutes";
 import { useState } from "react";
 import Login from "@/components/login";
 import Register from "@/components/register";
-
-
-const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/,
-      "Password must include uppercase, lowercase, number, and special character"
-    ),
-});
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(true);
