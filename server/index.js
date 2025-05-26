@@ -29,6 +29,8 @@ app.use("/api/v1/", Routes);
 // Setup Socket.IO
 const io = new Server(server, { cors: corsOptions });
 
+let users = {};
+
 io.on('connection', (socket) => {
     console.log('✅ New client connected');
 
@@ -52,6 +54,8 @@ io.on('connection', (socket) => {
             const user = await UserModel.findById(userId);
             if (user && !user.disabled && user.type === 'User') {
                 socket.emit('my_score', user.score); // 🔥 send their score only to them
+                users[socket.id] = { id: socket.id, name: user.name, score: user.score, profile: user.profile };
+                io.emit('activeUsers', Object.values(users));
             }
         } catch (error) {
             console.error('Error fetching user score on join:', error.message);
@@ -72,6 +76,12 @@ io.on('connection', (socket) => {
 
             io.emit('my', user.score)
 
+            // Check Active Status
+            if (users[socket.id]) {
+                users[socket.id].bananaClicks += 1;
+                io.emit('activeUsers', Object.values(users));
+            }
+
             // Broadcast updated leaderboard
             const users = await UserModel.find({ disabled: false, type: 'User' }).sort({ score: -1 });
             io.emit('update', users);
@@ -81,6 +91,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
+        delete users[socket.id];
+        io.emit('activeUsers', Object.values(users));
         console.log('❌ Client disconnected');
     });
 });

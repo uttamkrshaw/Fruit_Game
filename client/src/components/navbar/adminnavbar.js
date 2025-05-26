@@ -4,15 +4,16 @@ import { useRouter } from "next/navigation";
 
 export default function AdminNavbar() {
     const router = useRouter();
-    const { user } = useAuth()
-    console.log("user",user);
-    
+    const { setIsAuthenticated, setUserType, setUser, user } = useAuth();
     const handleLogout = () => {
         // Clear any auth token or user data here
+        setIsAuthenticated(false);
+        setUserType("");
+        setUser([]);
         localStorage.removeItem("token");
-        router.push("/login"); // Redirect to login
+        localStorage.removeItem("type");
+        router.push("/"); // Redirect to login
     };
-
     return (
         <nav className="bg-blue-600 text-white px-6 py-4 shadow-md">
             <div className="max-w-7xl mx-auto flex justify-between items-center">

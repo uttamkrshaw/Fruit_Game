@@ -3,9 +3,7 @@ export const UserAuthentication = async (req, res, next) => {
     try {
         if (!!req.headers?.authorization) {
             const token = req.headers?.authorization.split(" ")[1];
-            const decoded = jwt.verify(token, process.env.SecretKey)
-            console.log("decoded",decoded);
-            
+            const decoded = jwt.verify(token, process.env.SecretKey)            
             if (decoded) {
                 if (decoded?.type === 'User') {
                     next();

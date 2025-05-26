@@ -88,7 +88,7 @@ UserRouter.post('/register', uploadMiddleWare.single('profile'), async (req, res
 
 
 // User Details
-UserRouter.get('/me', UserAuthentication, async (req, res) => {
+UserRouter.get('/me', async (req, res) => {
     const token = req.headers.authorization.split(" ")[1];
     const decoded = jwt.decode(token, process.env.SecretKey)
     try {
@@ -151,9 +151,7 @@ UserRouter.get('/listall', UserAuthentication, async (req, res) => {
 // Admin Routes
 
 // Edit User Details
-UserRouter.patch('/edit/:id', AdminAuthentication, uploadMiddleWare.single('profile'), async (req, res) => {
-    const token = req.headers.authorization.split(" ")[1];
-    const decodedDetails = jwt.verify(token, process.env.SecretKey);
+UserRouter.patch('/edit/:id', AdminAuthentication, uploadMiddleWare.single('profile'), async (req, res) => {    
     try {
         const user = await UserModel.find({ _id: req.params?.id });
         if (user.length === 0) {
@@ -164,7 +162,7 @@ UserRouter.patch('/edit/:id', AdminAuthentication, uploadMiddleWare.single('prof
         updatedData.email = req.body?.email || user[0].email;
         updatedData.profile = req.file?.location || user[0].profile;
 
-        const updatedUser = await UserModel.findByIdAndUpdate(decodedDetails._id, updatedData, { new: true });
+        const updatedUser = await UserModel.findByIdAndUpdate(req.params.id, updatedData, { new: true });
         return res.json({ status: 'success', message: `User Details Updated Successfully!` })
     } catch (error) {
         return res.json({ status: 'error', message: `Failed To Update User Detail's. Error:- ${error.message}` })
@@ -172,15 +170,13 @@ UserRouter.patch('/edit/:id', AdminAuthentication, uploadMiddleWare.single('prof
 })
 
 // Block User
-UserRouter.patch('/block/:id', AdminAuthentication, uploadMiddleWare.single('profile'), async (req, res) => {
-    const token = req.headers.authorization.split(" ")[1];
-    const decodedDetails = jwt.verify(token, process.env.SecretKey);
+UserRouter.patch('/block/:id', AdminAuthentication, async (req, res) => {
     try {
         const user = await UserModel.find({ _id: req.params?.id });
         if (user.length === 0) {
             return res.json({ status: 'error', message: `No User Found With This ID!` })
         }
-        const updatedUser = await UserModel.findByIdAndUpdate(decodedDetails._id, { disabled: true }, { new: true });
+        const updatedUser = await UserModel.findByIdAndUpdate(req.params?.id, { disabled: true }, { new: true });        
         return res.json({ status: 'success', message: `User Account Blocked Successfully!` })
     } catch (error) {
         return res.json({ status: 'error', message: `Failed To Block User Account. Error:- ${error.message}` })
@@ -189,18 +185,30 @@ UserRouter.patch('/block/:id', AdminAuthentication, uploadMiddleWare.single('pro
 
 
 // UnBlock User
-UserRouter.patch('/unblock/:id', AdminAuthentication, uploadMiddleWare.single('profile'), async (req, res) => {
-    const token = req.headers.authorization.split(" ")[1];
-    const decodedDetails = jwt.verify(token, process.env.SecretKey);
+UserRouter.patch('/unblock/:id', AdminAuthentication,async (req, res) => {
     try {
         const user = await UserModel.find({ _id: req.params?.id });
         if (user.length === 0) {
             return res.json({ status: 'error', message: `No User Found With This ID!` })
         }
-        const updatedUser = await UserModel.findByIdAndUpdate(decodedDetails._id, { disabled: false }, { new: true });
+        const updatedUser = await UserModel.findByIdAndUpdate(req.params?.id, { disabled: false }, { new: true });
         return res.json({ status: 'success', message: `User Account UnBlocked Successfully!` })
     } catch (error) {
         return res.json({ status: 'error', message: `Failed To UnBlock User Account. Error:- ${error.message}` })
+    }
+})
+
+
+// Listing All User Based On Score
+UserRouter.get('/listall/admin', AdminAuthentication, async (req, res) => {
+    try {
+        const user = await UserModel.find({ type: 'User' }, { password: 0 }).sort({ score: -1 })
+        if (user.length === 0) {
+            return res.json({ status: 'error', message: `No Active User Found!` })
+        }
+        return res.json({ status: 'success', data: user })
+    } catch (error) {
+        return res.json({ status: 'error', message: `Failed To Update User Detail's. Error:- ${error.message}` })
     }
 })
 
