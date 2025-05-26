@@ -148,14 +148,14 @@ export default function Home() {
                                         alt={user.name}
                                         className="w-12 h-12 rounded-full object-cover"
                                     />
-                                   
+
                                 </div>
-                                 <div>
-                                        <p className="font-semibold text-gray-900">
-                                            #{index + 1} {user.name}
-                                        </p>
-                                        <p className="text-sm text-gray-500">{user.score} 🍌</p>
-                                    </div>
+                                <div>
+                                    <p className="font-semibold text-gray-900">
+                                        #{index + 1} {user.name}
+                                    </p>
+                                    <p className="text-sm text-gray-500">{user.score} 🍌</p>
+                                </div>
                             </li>
                         ))}
                     </ul>
