@@ -18,7 +18,7 @@ export default function Home() {
     const [acusers, setAcUsers] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [editUsers, setEditUsers] = useState([]);
-    const token = JSON.parse(localStorage.getItem('token'))
+    const token = localStorage.getItem('token')
     console.log("token",token);
     
     const GetUserDetails = async () => {
