@@ -2,41 +2,51 @@
 
 import UserNavbar from "@/components/navbar/usernavbar";
 import UserRoute from "@/components/routes/userroutes";
-import { apiurl } from "@/defaults/apiurl";
-import axios from "axios";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import io from 'socket.io-client';
 
 export default function RankingPage() {
     const [players, setPlayers] = useState([]);
+    const socket = io('http://localhost:4500'); // Replace with actual domain in production
 
-    // Replace this with your API URL
-    const fetchPlayerData = async () => {
-        const token = JSON.parse(localStorage.getItem('token'))
-        try {
-            const res = await axios.get(`${apiurl}user/listall`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            const data = await res.data;
-            if (data.status === 'success') {
-                setPlayers(data?.data)
-            } else {
-                toast.error(data.message)
-            }
-        } catch (error) {
-            toast.error(error.message)
-        }
-    };
+
+    // // Replace this with your API URL
+    // const fetchPlayerData = async () => {
+    //     const token = JSON.parse(localStorage.getItem('token'))
+    //     try {
+    //         const res = await axios.get(`${apiurl}user/listall`, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`
+    //             }
+    //         })
+    //         const data = await res.data;
+    //         if (data.status === 'success') {
+    //             setPlayers(data?.data)
+    //         } else {
+    //             toast.error(data.message)
+    //         }
+    //     } catch (error) {
+    //         toast.error(error.message)
+    //     }
+    // };
 
     useEffect(() => {
-        fetchPlayerData(); // Initial fetch
+        socket.on('update', (data) => {
+            console.log(data);
+            
+            setPlayers(data);
+        });
 
-        // Poll every 3 seconds for updates
-        const interval = setInterval(fetchPlayerData, 3000);
-        return () => clearInterval(interval);
+        return () => socket.off('update');
     }, []);
+
+    // useEffect(() => {
+    //     fetchPlayerData(); // Initial fetch
+
+    //     // Poll every 3 seconds for updates
+    //     const interval = setInterval(fetchPlayerData, 3000);
+    //     return () => clearInterval(interval);
+    // }, []);
 
     return (
         <>

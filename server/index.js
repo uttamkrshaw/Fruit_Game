@@ -1,38 +1,133 @@
-import 'dotenv/config'
+// Load env variables
+import 'dotenv/config';
 
 import express from 'express';
 import cors from 'cors';
-import { createServer } from "http";
+import { createServer } from 'http';
+import { Server } from 'socket.io'; // ✅ FIXED: Import Socket.IO Server
 import { connectDB } from './config/db.js';
 import { Routes } from './routes/routes.js';
+import { UserModel } from './model/user.model.js';
+
 const app = express();
 const server = createServer(app);
 
-app.use(express.json())
-// const io = new Server(server, {
-//     cors: {
-//         origin: process.env.clientUrl,
-//         methods: ["GET", "POST", "PATCH", "DELETE"],
-//         credentials: true
-//     }
-// });
+// Middleware
+app.use(express.json());
 
-app.use(cors({
+const corsOptions = {
     origin: process.env.clientUrl,
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true
-}))
+};
 
-app.use("/api/v1/",Routes)
+app.use(cors(corsOptions));
+
+// Routes
+app.use("/api/v1/", Routes);
+
+// Setup Socket.IO
+const io = new Server(server, { cors: corsOptions });
+
+// io.on('connection', (socket) => {
+//     console.log('✅ New client connected');
+
+//     // Increment Score of User
+//     socket.on('increment', async (userId) => {
+//         try {
+//             // Update the score
+//             const user = await UserModel.findOneAndUpdate(
+//                 { _id: userId },
+//                 { $inc: { score: 1 } },
+//                 { new: true, upsert: true }
+//             );
+
+//             // Get top users
+//             const users = await UserModel.find({ disabled: false, type: 'User' }).sort({ score: -1 });
+
+//             // Emit full leaderboard update
+//             io.emit('update', users);
+//         } catch (error) {
+//             console.error('Error during score update:', error.message);
+//         }
+//     });
+
+//     socket.on('join', async (userId) => {
+//         try {
+//             const user = await UserModel.find({_id:userId,disabled:false,type:'User'});
+//             socket.emit('my_score', user.score);
+//         } catch (error) { 
+//             console.error('Error fetching user score on join:', error.message);
+//         }
+//     });
+
+//     socket.on('score', async (userId) => {
+//         try {
+//             // Get User Score
+//             const user = await UserModel.find({ _id: userId, disabled: false });
+
+//             // Emit full leaderboard update
+//             io.emit('update', users);
+//         } catch (error) {
+//             console.error('Error during score update:', error.message);
+//         }
+//     });
+
+//     socket.on('disconnect', () => {
+//         console.log('❌ Client disconnected');
+//     });
+// });
+
+// Start Server
+
+
+io.on('connection', (socket) => {
+    console.log('✅ New client connected');
+
+    // When user joins, fetch and send their score
+    socket.on('join', async (userId) => {
+        try {
+            const user = await UserModel.findById(userId);
+            if (user && !user.disabled && user.type === 'User') {
+                socket.emit('my_score', user.score); // 🔥 send their score only to them
+            }
+        } catch (error) {
+            console.error('Error fetching user score on join:', error.message);
+        }
+    });
+
+    // When user clicks, increment their score and broadcast updated leaderboard
+    socket.on('increment', async (userId) => {
+        try {
+            const user = await UserModel.findOneAndUpdate(
+                { _id: userId },
+                { $inc: { score: 1 } },
+                { new: true }
+            );
+
+            // Send updated individual score
+            socket.emit('my_score', user.score);
+
+            // Broadcast updated leaderboard
+            const users = await UserModel.find({ disabled: false, type: 'User' }).sort({ score: -1 });
+            io.emit('update', users);
+        } catch (error) {
+            console.error('Error incrementing score:', error.message);
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('❌ Client disconnected');
+    });
+});
 
 
 
 server.listen(process.env.PORT, async () => {
     try {
         await connectDB();
-        console.log(`Server Started On PORT ${process.env.PORT}`);
+        console.log(`🚀 Server started on PORT ${process.env.PORT}`);
     } catch (error) {
-        console.log(`Failed To Run Server. Error Reason :- ${error.message}`);
-
+        console.error(`❌ Failed to start server: ${error.message}`);
     }
-})
+});

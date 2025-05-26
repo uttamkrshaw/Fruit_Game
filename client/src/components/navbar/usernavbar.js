@@ -4,8 +4,7 @@ import { useRouter } from "next/navigation";
 
 export default function UserNavbar() {
     const router = useRouter();
-    const { setIsAuthenticated, setUserType, setUser } = useAuth();
-
+    const { setIsAuthenticated, setUserType, setUser, user } = useAuth();
     const handleLogout = () => {
         // Clear any auth token or user data here
         setIsAuthenticated(false);
@@ -33,12 +32,15 @@ export default function UserNavbar() {
                         Ranking
                     </button>
                 </div>
-                <button
-                    onClick={handleLogout}
-                    className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm"
-                >
-                    Logout
-                </button>
+                <div className="flex gap-4">
+                    <h2>{user.name}</h2>
+                    <button
+                        onClick={handleLogout}
+                        className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm"
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
         </nav>
     );
