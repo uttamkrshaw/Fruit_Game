@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import AdminRoute from "@/components/routes/adminroutes";
+import AdminNavbar from "@/components/navbar/adminnavbar";
 
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
@@ -74,7 +75,7 @@ export default function Home() {
     };
     return (
         <AdminRoute>
-
+            <AdminNavbar />
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="max-w-md mx-auto p-10 bg-white shadow-md rounded-lg m-auto">
                     <h2 className="text-2xl font-semibold text-center mb-4 text-black">Admin Page Registration</h2>

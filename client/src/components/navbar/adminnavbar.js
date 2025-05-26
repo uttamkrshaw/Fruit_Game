@@ -1,9 +1,12 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function AdminNavbar() {
     const router = useRouter();
-
+    const { user } = useAuth()
+    console.log("user",user);
+    
     const handleLogout = () => {
         // Clear any auth token or user data here
         localStorage.removeItem("token");
@@ -27,12 +30,15 @@ export default function AdminNavbar() {
                         Ranking
                     </button>
                 </div>
-                <button
-                    onClick={handleLogout}
-                    className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm"
-                >
-                    Logout
-                </button>
+                <div>
+                    <h2>{user.name}</h2>
+                    <button
+                        onClick={handleLogout}
+                        className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm"
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
         </nav>
     );
