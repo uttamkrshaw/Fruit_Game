@@ -85,6 +85,20 @@ io.on('connection', (socket) => {
     console.log('✅ New client connected');
 
     // When user joins, fetch and send their score
+    socket.on('scores', async () => {
+        try {
+            const user = await UserModel.find({ disabled: false, type: 'User' }, { password: 0 });
+            if (user) {
+                socket.emit('rankings', user); // 🔥 send their score only to them
+            }
+        } catch (error) {
+            console.error('Error fetching user score on join:', error.message);
+        }
+    });
+
+
+
+    // When user joins, fetch and send their score
     socket.on('join', async (userId) => {
         try {
             const user = await UserModel.findById(userId);
@@ -107,6 +121,8 @@ io.on('connection', (socket) => {
 
             // Send updated individual score
             socket.emit('my_score', user.score);
+
+            io.emit('my', user.score)
 
             // Broadcast updated leaderboard
             const users = await UserModel.find({ disabled: false, type: 'User' }).sort({ score: -1 });

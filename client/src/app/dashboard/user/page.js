@@ -12,55 +12,24 @@ export default function Home() {
     const router = useRouter();
     const { user } = useAuth()
     const [clickCount, setClickCount] = useState(0);
-    console.log("user in dashboard", user);
     const socket = io('http://localhost:4500'); // Replace with actual domain in production
-
-
-    // useEffect(() => {
-    //     // socket.on('update', (data) => {
-    //     //     // setUsers(data);
-    //     //     console.log(data);
-
-    //     // });
-
-    //     // return () => socket.off('update');
-
-    //     socket.emit("join", user._id); // 🔥 Request own score on connect
-
-    //     socket.on("my_score", (myScore) => {
-    //         setScore(myScore);
-    //     });
-    //     socket.on('join', (data) => {
-    //         setClickCount(data);
-
-    //     });
-
-    //     return () => socket.off('join');
-    // }, []);
-
-
 
     useEffect(() => {
         if (user) {
             socket.emit("join", user._id); // 🔥 Request own score on connect
         }
 
-        socket.on("my_score", (myScore) => {
-            setClickCount(myScore);
+        socket.on("my_score", (data) => {            
+            setClickCount(data);
         });
 
-        // socket.on("update", (users) => {
-        //     setLeaderboard(users);
-        // });
-
-        return () => {
-            // socket.off("my_score");
-            // socket.off("update");
-        };
+        socket.on("my", (data) => {
+            setClickCount(data);
+        });
     }, [clickCount]);
 
     const handleClick = () => {
-        setClickCount(clickCount + 1);
+        // setClickCount(clickCount + 1);
         socket.emit('increment', user._id);
     };
 

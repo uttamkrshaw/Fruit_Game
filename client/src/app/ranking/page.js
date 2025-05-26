@@ -2,51 +2,32 @@
 
 import UserNavbar from "@/components/navbar/usernavbar";
 import UserRoute from "@/components/routes/userroutes";
+import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 
 export default function RankingPage() {
     const [players, setPlayers] = useState([]);
+    const { user } = useAuth();
     const socket = io('http://localhost:4500'); // Replace with actual domain in production
 
-
-    // // Replace this with your API URL
-    // const fetchPlayerData = async () => {
-    //     const token = JSON.parse(localStorage.getItem('token'))
-    //     try {
-    //         const res = await axios.get(`${apiurl}user/listall`, {
-    //             headers: {
-    //                 'Authorization': `Bearer ${token}`
-    //             }
-    //         })
-    //         const data = await res.data;
-    //         if (data.status === 'success') {
-    //             setPlayers(data?.data)
-    //         } else {
-    //             toast.error(data.message)
-    //         }
-    //     } catch (error) {
-    //         toast.error(error.message)
-    //     }
-    // };
+    // Replace this with your API URL
 
     useEffect(() => {
-        socket.on('update', (data) => {
-            console.log(data);
-            
+        if (user) {
+            socket.emit("scores"); // 🔥 Request own score on connect
+        }
+
+        socket.on('rankings', (data) => {
             setPlayers(data);
         });
 
-        return () => socket.off('update');
+        socket.on('update', (data) => {            
+            setPlayers(data);
+        });
+
+        return () => {socket.off('scores') }
     }, []);
-
-    // useEffect(() => {
-    //     fetchPlayerData(); // Initial fetch
-
-    //     // Poll every 3 seconds for updates
-    //     const interval = setInterval(fetchPlayerData, 3000);
-    //     return () => clearInterval(interval);
-    // }, []);
 
     return (
         <>
