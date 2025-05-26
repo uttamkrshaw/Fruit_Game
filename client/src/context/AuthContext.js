@@ -30,8 +30,8 @@ export const AuthProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        const token = JSON.parse(localStorage.getItem("token")); // or sessionStorage / cookie
-        const type = JSON.parse(localStorage.getItem("type"));
+        const token = localStorage.getItem("token"); // or sessionStorage / cookie
+        const type = localStorage.getItem("type");
         setUserType(type);
         setIsAuthenticated(!!token);
         if (token) {

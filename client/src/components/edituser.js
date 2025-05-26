@@ -26,7 +26,7 @@ const editUserSchema = z.object({
 
 export default function EditUserModal({ isOpen, onClose, user }) {
     const router = useRouter();
-    const token = JSON.parse(localStorage.getItem('token'))
+    const token = localStorage.getItem('token')
     const {
         register,
         handleSubmit,

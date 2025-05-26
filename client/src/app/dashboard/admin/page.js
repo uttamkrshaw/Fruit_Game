@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import AdminRoute from "@/components/routes/adminroutes";
@@ -19,6 +19,8 @@ export default function Home() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [editUsers, setEditUsers] = useState([]);
     const token = JSON.parse(localStorage.getItem('token'))
+    console.log("token",token);
+    
     const GetUserDetails = async () => {
         try {
             const res = await axios.get(`${apiurl}/api/v1/user/listall/admin`, {
