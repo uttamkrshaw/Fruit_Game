@@ -1,6 +1,7 @@
 "use client";
+
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import UserNavbar from "@/components/navbar/usernavbar";
 import UserRoute from "@/components/routes/userroutes";
 import io from 'socket.io-client';

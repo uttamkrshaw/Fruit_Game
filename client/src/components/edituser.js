@@ -26,7 +26,6 @@ const editUserSchema = z.object({
 
 export default function EditUserModal({ isOpen, onClose, user }) {
     const router = useRouter();
-    const token = localStorage.getItem('token')
     const {
         register,
         handleSubmit,
@@ -48,6 +47,8 @@ export default function EditUserModal({ isOpen, onClose, user }) {
     }, [user, setValue]);
 
     const onSubmit = async (data) => {
+        const token = localStorage.getItem('token');
+
         const formData = new FormData();
 
         formData.append("name", data.name);

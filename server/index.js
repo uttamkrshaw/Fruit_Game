@@ -55,6 +55,8 @@ io.on('connection', (socket) => {
             if (user && !user.disabled && user.type === 'User') {
                 socket.emit('my_score', user.score); // 🔥 send their score only to them
                 users[socket.id] = { id: socket.id, name: user.name, score: user.score, profile: user.profile };
+                console.log("users",users);
+                
                 io.emit('activeUsers', Object.values(users));
             }
         } catch (error) {
