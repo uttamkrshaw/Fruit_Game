@@ -24,12 +24,12 @@ export default function AdminNavbar() {
                     >
                         Home
                     </button>
-                    <button
+                    {/* <button
                         onClick={() => router.push("/dashboard/ranking")}
                         className="hover:text-yellow-300 transition"
                     >
                         Ranking
-                    </button>
+                    </button> */}
                 </div>
                 <div>
                     <h2>{user.name}</h2>
