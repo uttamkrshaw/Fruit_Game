@@ -111,7 +111,7 @@ export default function EditUserModal({ isOpen, onClose, user }) {
                         {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                     </div>
                     <div>
-                        <label className="block text-lg font-medium text-black">Profile Image (optional)</label>
+                        <label className="block text-lg font-medium text-black">Profile Image</label>
                         <input
                             type="file"
                             accept="image/jpeg,image/jpg,image/png,image/webp"
